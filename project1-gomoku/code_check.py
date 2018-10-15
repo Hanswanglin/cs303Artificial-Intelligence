@@ -63,7 +63,7 @@ class CodeCheck():
     # check exec a go() within one sec
     def __check_go (self, chessboard):
         try:
-            timeout(4)(self.agent.go)(np.copy(chessboard))
+            timeout(1)(self.agent.go)(np.copy(chessboard))
         except Exception:
             self.errormsg = "Error:" + traceback.format_exc()
             return False
@@ -110,6 +110,7 @@ class CodeCheck():
         chessboard[1, 0:4] = 1
         if not self.__check_result(chessboard, [[0, 4]]):
             return False
+        print("====================1. first advance test have pass==============")
         
         # defense 5 inline
         chessboard = np.zeros((self.chessboard_size, self.chessboard_size), dtype=np.int)
@@ -118,6 +119,7 @@ class CodeCheck():
         chessboard[1, 0:4] = 1
         if not self.__check_result(chessboard, [[1, 4]]):
             return False
+        print("====================2. second advance test have pass==============")
         
         # two three
         chessboard = np.zeros((self.chessboard_size, self.chessboard_size), dtype=np.int)
@@ -127,6 +129,7 @@ class CodeCheck():
         chessboard[2:4, 8] = 1
         if not self.__check_result(chessboard, [[1, 3]]):
             return False
+        print("====================3. third advance test have pass==============")
         
         # defense
         chessboard = np.zeros((self.chessboard_size, self.chessboard_size), dtype=np.int)
@@ -136,6 +139,8 @@ class CodeCheck():
         chessboard[2:4, 8] = 1
         if not self.__check_result(chessboard, [[1, 8]]):
             return False
+
+        print("====================4. fourth advance test have pass==============")
 
         return True
 

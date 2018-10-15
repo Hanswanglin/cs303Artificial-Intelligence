@@ -39,6 +39,7 @@ class AI(object):
     def go(self, chessboard):
         # Clear candidate_list
         self.candidate_list.clear()
+        print("color = " + str(self.color))
         # ==================================================================
         # Write your algorithm here
 
@@ -66,19 +67,26 @@ class AI(object):
             print("enemy_scoreList="+str(enemy_scoreList))
             my_eval = self.__get_list_sum(my_scoreList)                                             # 获取我的分数总和
             enemy_eval = self.__get_list_sum(enemy_scoreList)                                       # 获取对方的分数总和
+            print("my_eval="+ str(my_eval))
             print("enemy_eval=" + str(enemy_eval))
-            try:
-                print("I have get try try try try")
-                attack_defensive_state = my_eval / enemy_eval
-            except ZeroDivisionError:
-                attack_defensive_state = 2
-            print("I have go here")
-            if attack_defensive_state >= 1:
-                # attack
-                blankPiece_index = self.__descend_sort(my_scoreList)[0][0]
-            else:
-                # defensive
-                blankPiece_index = self.__descend_sort(enemy_scoreList)[0][0]
+            combine_scoreList = self.__combine_list(my_scoreList, enemy_scoreList)
+            print("combine_scoreList" + str(combine_scoreList))
+            blankPiece_index = self.__descend_sort(combine_scoreList)[0][0]                         # 只取第一个tuple的第一个数值，第一个tuple是最大的，第一个tuple的第一个数值是index
+
+            # try:
+            #     print("I have get try try try try")
+            #     attack_defensive_state = my_eval / enemy_eval
+            # except ZeroDivisionError:
+            #     attack_defensive_state = 2
+            # print("I have go here")
+
+            # if attack_defensive_state >= 1:
+            #     # attack
+            #     blankPiece_index = self.__descend_sort(my_scoreList)[0][0]
+            # else:
+            #     # defensive
+            #     blankPiece_index = self.__descend_sort(enemy_scoreList)[0][0]
+
             new_pos = blankPiece_list[blankPiece_index]
 
 
@@ -103,12 +111,16 @@ class AI(object):
             vertical_string = self.__get_vertical_pattern(chessboard, color, x, y)
             leftd_string = self.__get_leftdiagonally_pattern(chessboard, color, x, y)
             rightd_string = self.__get_rightdiagonally_pattern(chessboard, color, x, y)
+            print("horizontal_string = " + str(horizontal_string))
+            print("vertical_string = " + str(vertical_string))
 
             # 然后再分别计算四个方向位置的分值
             horizontal_score = self.__earn_value(horizontal_string)
             vertical_score = self.__earn_value(vertical_string)
             leftd_score = self.__earn_value(leftd_string)
             rightd_score = self.__earn_value(rightd_string)
+            # print("horizontal_score" + str(horizontal_score))
+            # print("vertical_score" + str(vertical_score))
 
             # 加在一起
             blankP_score = horizontal_score + vertical_score + leftd_score + rightd_score
@@ -137,7 +149,11 @@ class AI(object):
     def __earn_value(self, pattern):                  # pattern is a String
         score = 0
         for p, s in zip(string_patternList, score_patternList):
-            if p or p[::-1] in pattern:               # some string or its reverse
+            reverse_p = p[::-1]
+            if p in pattern:               # some string or its reverse
+                score = s
+                break
+            elif reverse_p in pattern:
                 score = s
                 break
         return score
@@ -153,6 +169,12 @@ class AI(object):
     def __descend_sort(self, list):
         return sorted(enumerate(list), key=lambda x:x[1], reverse=True)
 
+    # 组合两个list的对应值得到新的list
+    def __combine_list(self, list1, list2):
+        sum = []
+        for l1, l2 in zip(list1, list2):
+            sum.append(l1+l2)
+        return sum
 
     # 获取到水平方向上的图样
     def __get_horizontal_pattern(self, chessboard, color, x, y):
@@ -210,11 +232,11 @@ class AI(object):
             else:
                 piece_value_down = chessboard[xdowne][y]
                 if piece_value_down == color:
-                    vertical_string = 'o' + vertical_string
+                    vertical_string = vertical_string + 'o'
                 elif piece_value_down == 0:
-                    vertical_string = '_' + vertical_string
+                    vertical_string = vertical_string + '_'
                 else:
-                    vertical_string = 'x' + vertical_string
+                    vertical_string = vertical_string + 'x'
                     break
         return vertical_string
 
