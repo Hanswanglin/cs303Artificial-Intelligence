@@ -8,11 +8,11 @@ class Graph(object):
         # cost list for all edge
         self.costs = costs
         # construct distance matrix and path matrix
-        self.dist, self.path = self.__matrix_construct__()
+        self.dist = self.__matrix_construct()
         # use Floyd algorithm to get shortest dist and corresponding path
-        self.shortest_dist, self.shortest_path = self.__floyd_shortest_path__()
+        self.shortest_dist = self.__floyd_shortest_path()
 
-    def __matrix_construct__(self):
+    def __matrix_construct(self):
         dist = np.ones((self.nodes, self.nodes), dtype=np.float) * np.inf
         path = np.zeros((self.nodes, self.nodes), dtype=np.float)
 
@@ -24,9 +24,9 @@ class Graph(object):
         for i in self.costs:
             dist[int(i[1]) - 1, int(i[0]) - 1] = dist[int(i[0]) - 1, int(i[1]) - 1] = float(self.costs[i])
 
-        return dist, path
+        return dist
 
-    def __floyd_shortest_path__(self):
+    def __floyd_shortest_path(self):
         '''
         For the method of Floyd, the diagonal value like ('3','3') could be ignored which will decrease
         time used to compare.
@@ -42,7 +42,4 @@ class Graph(object):
                     select = np.inf if (shortest_dist[row][temp] == np.inf or shortest_dist[temp][col] == np.inf) else shortest_dist[row][temp] + shortest_dist[temp][col]
                     if shortest_dist[row][col] > select:
                         shortest_dist[row][col] = select
-                        self.path[row][col] = self.path[row][temp]
-        print('self.dist\n', shortest_dist)
-
         return shortest_dist

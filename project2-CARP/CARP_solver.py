@@ -36,63 +36,57 @@ def file_parse(file):
                 task_demand[int(temp[0]), int(temp[1])] = int(temp[3])
             i += 1
 
-def matrix_construct(instance):
-    size = instance['vertices']
-    dist = np.ones((size, size), dtype=np.float)* np.inf
-    path = np.zeros((size, size), dtype=np.float)
-
-    for i in range(size):
-        dist[i,i] = 0
-        # construct path matrix
-        path[:,i] = i
-    # construct distance matrix
-    for i in costs:
-        dist[int(i[1])-1, int(i[0])-1] = dist[int(i[0])-1, int(i[1])-1] = float(costs[i])
-
-    return dist, path
-
-def floyd_shortest_path(vexnum, dist, path):
-    # core algorithm to get shortest cost
-    for temp in range(vexnum):
-        for row in range(vexnum):
-            for col in range(vexnum):
-                select = np.inf if(dist[row][temp] == np.inf or dist[temp][col] == np.inf) \
-                    else dist[row][temp]+dist[temp][col]
-                if dist[row][col] > select:
-                    dist[row][col] = select
-                    path[row][col] = path[row][temp]
-
-    shortest_path = dict()
-    for row in range(vexnum):
-        for col in range(vexnum):
-            path_list = []
-            temp = path[row][col]
-            while temp != col:
-                path_list.append(int(temp+1))
-                temp = path[int(temp)][col]
-            shortest_path[int(row+1), int(col+1)] =[int(row+1)] + path_list + [int(col+1)]
-    return dist
+def find_best(solver_list):
+    min_q = sys.maxsize
+    min_solver = None
+    for solver_obj in solver_list:
+        q = int((solver_obj.q).replace('q ',''))
+        if q <= min_q:
+            min_q = q
+            min_solver = solver_obj
+    return min_solver
 
 
 def main():
     # get command-line argument
     args = argv_parse()
     file = args.file
-    # run_time = args.t
-    # random_seed = args.s
 
     # construct file_info data
     file_parse(file)
 
-    # shortest cost generate
-    # nodes = len(instance['nodes'])
-    # costs = instance['costs']
-    # graph = Graph(nodes=nodes, costs=costs)
-    # print(graph.shortest_dist)
-    # print(graph.shortest_path)
-    dist, path = matrix_construct(instance)
-    dist = floyd_shortest_path(vexnum=instance['vertices'], dist=dist, path=path)
+    # construct the graph to calculate the shortest cost for all nodes
+    graph = Graph(nodes=instance['vertices'], costs=costs)
+    dist = graph.shortest_dist
     dist = dist.astype(np.int)
+
+    # create five objects to get solution
+    solver_list = []
+
+    # use rule1 to get the path-scanning solution
+    solver1 = Solver(dist, costs, instance['capacity'], task_demand.copy(), instance['depot'], 1)
+    solver_list.append(solver1)
+
+    # use rule2 to get the path-scanning solution
+    solver2 = Solver(dist, costs, instance['capacity'], task_demand.copy(), instance['depot'], 2)
+    solver_list.append(solver2)
+
+    # use rule3 to get the path-scanning solution
+    solver3 = Solver(dist, costs, instance['capacity'], task_demand.copy(), instance['depot'], 3)
+    solver_list.append(solver3)
+
+    # use rule4 to get the path-scanning solution
+    solver4 = Solver(dist, costs, instance['capacity'], task_demand.copy(), instance['depot'], 4)
+    solver_list.append(solver4)
+
+    # use rule5 to get the path-scanning solution
+    solver5 = Solver(dist, costs, instance['capacity'], task_demand.copy(), instance['depot'], 5)
+    solver_list.append(solver5)
+
+    min_solver = find_best(solver_list)
+    print(min_solver.s)
+    print(min_solver.q)
+
 
 if __name__ == "__main__":
     start = time.time()
