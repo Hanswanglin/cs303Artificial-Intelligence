@@ -18,7 +18,7 @@ live_two1 = "__oo__"                    #120
 live_two2 = "__o_o_"                    #120
 live_one = "___o__"                     #20
 string_patternList = [five_connected, live_four, flush_four1, flush_four2, flush_four3, connected_three, jump_three, live_two1, live_two2, live_one]
-score_patternList = [50000, 4320, 720, 720, 720, 720, 720, 120, 110, 20]
+score_patternList = [50000, 4320, 730, 720, 720, 720, 715, 120, 110, 20]
 
 
 # don't change the class name
